@@ -356,6 +356,7 @@ const Admin = () => {
   const [activeMoveSubcat, setActiveMoveSubcat] = useState<{name: string, currentCategory: string | 'UNLINKED'} | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
   const [adminActiveCategory, setAdminActiveCategory] = useState<string | null>(null);
   const [adminActiveSubcategory, setAdminActiveSubcategory] = useState<string | null>(null);
   const [adminProductSearch, setAdminProductSearch] = useState('');
@@ -640,6 +641,7 @@ const Admin = () => {
       }
       setEditingProduct(null);
       setIsAddingNew(false);
+      setNewImagePreview(null);
     } catch (err: any) {
       logger.error('Failed to save product:', err);
       alert('Error saving product. Please try again.');
@@ -651,6 +653,7 @@ const Admin = () => {
   const cancelEdit = () => {
     setEditingProduct(null);
     setIsAddingNew(false);
+    setNewImagePreview(null);
   };
 
   // --- Analytics Calculations ---
@@ -1763,7 +1766,7 @@ const Admin = () => {
                     if (adminActiveSubcategory && p.subcategory !== adminActiveSubcategory) return false;
                     if (adminProductSearch) {
                       const t = adminProductSearch.toLowerCase();
-                      if (!p.name.toLowerCase().includes(t) && !p.description.toLowerCase().includes(t)) return false;
+                      if (!p.name?.toLowerCase().includes(t) && !p.description?.toLowerCase().includes(t)) return false;
                     }
                     return true;
                   }).map(p => {
@@ -1931,11 +1934,30 @@ const Admin = () => {
                     </div>
                   </div>
                 )}
+                {!editingProduct && newImagePreview && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', background: 'var(--bg)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                    <img src={newImagePreview} alt="New product preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '6px' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Image Preview</span>
+                    </div>
+                  </div>
+                )}
                 <div style={{ position: 'relative', overflow: 'hidden' }}>
-                  <input type="file" name="imageFile" accept="image/*" required={!editingProduct} id="imageFile" style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', zIndex: 10, left: 0, top: 0 }} />
+                  <input type="file" name="imageFile" accept="image/*" required={!editingProduct} id="imageFile" style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer', zIndex: 10, left: 0, top: 0 }} onChange={async (e) => {
+                    if (e.target.files && e.target.files[0] && !editingProduct) {
+                      try {
+                        const base64 = await convertImageToBase64(e.target.files[0]);
+                        setNewImagePreview(base64);
+                      } catch (err) {
+                        logger.error('Failed to process image preview:', err);
+                      }
+                    } else if (!e.target.files?.[0] && !editingProduct) {
+                      setNewImagePreview(null);
+                    }
+                  }} />
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', border: '2px dashed var(--border)', padding: '16px', borderRadius: '8px', background: 'white', transition: 'border 0.2s ease' }}>
                     <div style={{ background: 'var(--primary)', color: 'white', padding: '10px 20px', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600 }}>Choose File</div>
-                    <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{editingProduct ? 'Upload new file to replace' : 'No file chosen'}</span>
+                    <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{editingProduct ? 'Upload new file to replace' : (newImagePreview ? 'File selected (replace?)' : 'No file chosen')}</span>
                   </div>
                 </div>
               </div>

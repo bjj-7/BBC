@@ -8,7 +8,8 @@ import { productSchema, createOrderSchema, productRequestSchema } from './valida
 export async function addProductAction(product: Omit<Product, 'id'>) {
   const parsed = productSchema.parse(product);
   const supabase = await createClient();
-  const { error } = await supabase.from('products').insert([parsed]);
+  const id = crypto.randomUUID();
+  const { error } = await supabase.from('products').insert([{ ...parsed, id }]);
   if (error) throw error;
 }
 

@@ -235,6 +235,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   updateStoreSettings: async (settings) => {
     await updateStoreSettingsAction(settings);
+    set({ storeSettings: settings });
   },
 
   createOrder: async (order) => {

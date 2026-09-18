@@ -39,7 +39,7 @@ content = content.replace(
 // replace updateStoreSettings
 content = content.replace(
   /updateStoreSettings:\s*async\s*\(([^)]+)\)\s*=>\s*\{[\s\S]*?(?=\s+createOrder:)/,
-  'updateStoreSettings: async ($1) => {\n    await updateStoreSettingsAction($1);\n  },'
+  'updateStoreSettings: async ($1) => {\n    await updateStoreSettingsAction($1);\n    set({ storeSettings: $1 });\n  },'
 );
 
 // replace createOrder

@@ -23,7 +23,13 @@ export const createOrderSchema = z.object({
   items: z.array(
     z.object({
       id: z.string().min(1),
-      quantity: z.number().int().positive()
+      quantity: z.number().int().positive(),
+      name: z.string().min(1),
+      price: z.number().min(0),
+      category: z.string().optional().nullable(),
+      subcategory: z.string().optional().nullable(),
+      imageUrl: z.string().optional().nullable(),
+      image: z.string().optional().nullable()
     })
   ).min(1, "Order must contain at least one item")
 });
