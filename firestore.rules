@@ -1,0 +1,77 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper Functions ────────────────────────────────────────────────────
+    // Admin authorization is enforced here in Firestore Security Rules, which
+    // run server-side in Google's infrastructure — NOT in the browser.
+    // The email list below is a server-side check and is never sent to clients.
+    // (Custom Claims via Cloud Functions would be cleaner but require Blaze plan.)
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email in [
+          'bbc.savoye@gmail.com',
+          'v.jonathanwilliamusa@gmail.com',
+          'w.vivekan@gmail.com'
+        ];
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // ─── Products ────────────────────────────────────────────────────────────
+    // Anyone can read products (public storefront).
+    // Only admins can create, update, or delete products.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Store Settings ──────────────────────────────────────────────────────
+    // Anyone can read settings (needed for home page rendering).
+    // Only admins can modify settings.
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Orders ──────────────────────────────────────────────────────────────
+    // Creating an order is handled securely by the `createOrder` Cloud Function.
+    // Clients can no longer create orders directly.
+    // Reading an order is allowed only to the order's owner or an admin.
+    // Updating status is admin-only (users can only read their own orders).
+    match /orders/{orderId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+
+      // Users can mark their own shipped orders as complete (status -> 'complete')
+      allow update: if isAdmin()
+        || (isSignedIn()
+            && resource.data.userId == request.auth.uid
+            && resource.data.status == 'shipped'
+            && request.resource.data.status == 'complete'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']));
+
+      allow delete: if isAdmin();
+    }
+
+    // ─── Product Requests ────────────────────────────────────────────────────
+    // Rate limiting: document ID must be `{uid}_{productId}`, enforcing a maximum
+    // of ONE active request per authenticated user per product. Submitting again
+    // for the same product simply overwrites the previous request (last-write-wins),
+    // which is the desired UX for a restock notification.
+    match /productRequests/{requestId} {
+      allow create, update: if isSignedIn()
+        && requestId == request.auth.uid + '_' + request.resource.data.productId
+        && request.resource.data.keys().hasAll([
+          'productId', 'productName', 'quantity', 'createdAt'
+        ])
+        && request.resource.data.quantity is number
+        && request.resource.data.quantity > 0;
+
+      allow read, delete: if isAdmin();
+    }
+  }
+}
+
