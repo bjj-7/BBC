@@ -487,7 +487,7 @@ h1, h2, h3, h4, .serif {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.4);
   display: flex; align-items: flex-start; justify-content: center;
-  padding: 5svh 20px 20px;
+  padding: 0 20px;
   overflow-y: auto;
   z-index: 30;
 }
@@ -502,7 +502,7 @@ h1, h2, h3, h4, .serif {
   gap: 10px;
   max-height: 90svh;
   overflow-y: auto;
-  margin-bottom: 5svh;
+  margin: 5svh auto;
 }
 
 /* Print Styles for Invoice */
