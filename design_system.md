@@ -68,3 +68,8 @@ To prevent horizontal overflow and broken layouts on mobile screens (like the Ad
 
 4. **Padding Consistency**:
    - Page containers should use standard paddings, usually `padding: '40px 20px'` (top/bottom 40px, left/right 20px). The `20px` horizontal padding ensures breathing room on small screens without squeezing content.
+
+5. **Modal Layouts & Vertical Centering**:
+   - ❌ Avoid using `padding` on a flex container (e.g., `.modal`) to create vertical spacing when it has `overflow-y: auto`. Mobile browsers often collapse or ignore this padding when the content overflows, causing it to touch the very edge of the screen.
+   - ❌ Avoid using `align-items: center` for modals that might exceed the viewport height. This causes flexbox to push the top of the modal entirely off the screen, preventing the user from scrolling up to see it.
+   - ✅ Use `align-items: flex-start` on the parent modal container, and apply top/bottom spacing using `margin` on the child `.modal-box` instead (e.g., `margin: 5svh auto`). Always use `svh` (small viewport height) rather than `vh` to prevent mobile address bars from hiding your content.
