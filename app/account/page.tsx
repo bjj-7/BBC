@@ -107,18 +107,18 @@ const Account = () => {
 
             {isAddingAddress ? (
               <form onSubmit={handleSaveAddress} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <input type="text" placeholder="Full Name" required value={newAddress.name} onChange={e => setNewAddress({...newAddress, name: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
-                <input type="text" placeholder="Phone Number" required value={newAddress.phone} onChange={e => setNewAddress({...newAddress, phone: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
-                <input type="text" placeholder="Street Address" required value={newAddress.street} onChange={e => setNewAddress({...newAddress, street: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
-                <input type="text" placeholder="Apt, Suite, etc. (optional)" value={newAddress.apt} onChange={e => setNewAddress({...newAddress, apt: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  <input type="text" placeholder="City" required value={newAddress.city} onChange={e => setNewAddress({...newAddress, city: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
-                  <input type="text" placeholder="State" required value={newAddress.state} onChange={e => setNewAddress({...newAddress, state: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
+                <input type="text" placeholder="Full Name" required value={newAddress.name} onChange={e => setNewAddress({...newAddress, name: e.target.value})} className="form-input" style={{ padding: '10px', fontSize: '0.9rem', width: '100%' }} />
+                <input type="tel" placeholder="Phone Number" required value={newAddress.phone} onChange={e => setNewAddress({...newAddress, phone: e.target.value})} className="form-input" style={{ padding: '10px', fontSize: '0.9rem', width: '100%' }} />
+                <input type="text" placeholder="Street Address" required value={newAddress.street} onChange={e => setNewAddress({...newAddress, street: e.target.value})} className="form-input" style={{ padding: '10px', fontSize: '0.9rem', width: '100%' }} />
+                <input type="text" placeholder="Apt, Suite, etc. (optional)" value={newAddress.apt} onChange={e => setNewAddress({...newAddress, apt: e.target.value})} className="form-input" style={{ padding: '10px', fontSize: '0.9rem', width: '100%' }} />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px' }}>
+                  <input type="text" placeholder="City" required value={newAddress.city} onChange={e => setNewAddress({...newAddress, city: e.target.value})} className="form-input" style={{ padding: '10px', fontSize: '0.9rem', width: '100%' }} />
+                  <input type="text" placeholder="State" required value={newAddress.state} onChange={e => setNewAddress({...newAddress, state: e.target.value})} className="form-input" style={{ padding: '10px', fontSize: '0.9rem', width: '100%' }} />
                 </div>
-                <input type="text" placeholder="PIN Code" required value={newAddress.zip} onChange={e => setNewAddress({...newAddress, zip: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
-                <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
-                  <button type="submit" className="primary-btn" style={{ padding: '6px 12px', fontSize: '0.85rem', flex: 1 }}>Save</button>
-                  <button type="button" className="secondary-btn" style={{ padding: '6px 12px', fontSize: '0.85rem', flex: 1 }} onClick={() => setIsAddingAddress(false)}>Cancel</button>
+                <input type="text" placeholder="PIN Code" required value={newAddress.zip} onChange={e => setNewAddress({...newAddress, zip: e.target.value})} className="form-input" style={{ padding: '10px', fontSize: '0.9rem', width: '100%' }} />
+                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                  <button type="submit" className="primary-btn" style={{ padding: '10px 12px', fontSize: '0.9rem', flex: 1 }}>Save</button>
+                  <button type="button" className="secondary-btn" style={{ padding: '10px 12px', fontSize: '0.9rem', flex: 1 }} onClick={() => setIsAddingAddress(false)}>Cancel</button>
                 </div>
               </form>
             ) : (
@@ -127,16 +127,16 @@ const Account = () => {
                   <p style={{ margin: 0, fontSize: '0.9rem', color: '#666' }}>No addresses saved yet.</p>
                 ) : (
                   savedAddresses.map((addr: any) => (
-                    <div key={addr.id} style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '6px', background: 'white', position: 'relative' }}>
+                    <div key={addr.id} style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '8px', background: 'white', position: 'relative', wordBreak: 'break-word' }}>
                       <button 
                         onClick={() => handleDeleteAddress(addr.id)}
-                        style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', color: '#999', cursor: 'pointer', fontSize: '1.2rem', lineHeight: 1 }}
+                        style={{ position: 'absolute', top: '12px', right: '12px', background: 'none', border: 'none', color: '#999', cursor: 'pointer', fontSize: '1.4rem', lineHeight: 1 }}
                         title="Delete address"
                       >&times;</button>
-                      <p style={{ margin: '0 0 4px 0', fontWeight: 'bold', fontSize: '0.9rem', paddingRight: '20px' }}>{addr.name}</p>
-                      <p style={{ margin: '0 0 2px 0', fontSize: '0.85rem', color: '#555' }}>{addr.street}{addr.apt ? `, ${addr.apt}` : ''}</p>
-                      <p style={{ margin: '0 0 2px 0', fontSize: '0.85rem', color: '#555' }}>{addr.city}, {addr.state} {addr.zip}</p>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#555' }}>{addr.phone}</p>
+                      <p style={{ margin: '0 0 4px 0', fontWeight: 'bold', fontSize: '0.95rem', paddingRight: '25px' }}>{addr.name}</p>
+                      <p style={{ margin: '0 0 4px 0', fontSize: '0.9rem', color: '#555' }}>{addr.street}{addr.apt ? `, ${addr.apt}` : ''}</p>
+                      <p style={{ margin: '0 0 4px 0', fontSize: '0.9rem', color: '#555' }}>{addr.city}, {addr.state} {addr.zip}</p>
+                      <p style={{ margin: 0, fontSize: '0.9rem', color: '#555' }}>{addr.phone}</p>
                     </div>
                   ))
                 )}
