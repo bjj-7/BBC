@@ -13,7 +13,8 @@ const imports = `import {
   cancelOrderAction,
   getAllProductRequestsAction,
   createProductRequestAction,
-  createOrderAction
+  createOrderAction,
+  updateUserAddressesAction
 } from '../../app/actions';\n`;
 
 content = content.replace(/import \{ supabase \} from '\.\.\/supabase\/config';/, "import { supabase } from '../supabase/config';\n" + imports);
@@ -84,5 +85,11 @@ content = content.replace(
   'getAllProductRequests: async () => {\n    return await getAllProductRequestsAction();\n  },'
 );
 
+
+// replace updateUserAddresses
+content = content.replace(
+  /updateUserAddresses:\s*async\s*\(([^)]+)\)\s*=>\s*\{[\s\S]*?(?=\s+updateOrderStatus:)/,
+  'updateUserAddresses: async ($1) => {\n    await updateUserAddressesAction($1);\n    const currentUser = get().user;\n    if (currentUser) {\n      set({ user: { ...currentUser, user_metadata: { ...currentUser.user_metadata, savedAddresses: $1 } } });\n    }\n  },'
+);
 
 fs.writeFileSync('src/store/useAppStore.ts', content);

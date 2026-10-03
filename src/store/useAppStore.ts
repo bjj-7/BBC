@@ -11,7 +11,8 @@ import {
   cancelOrderAction,
   getAllProductRequestsAction,
   createProductRequestAction,
-  createOrderAction
+  createOrderAction,
+  updateUserAddressesAction
 } from '../../app/actions';
 
 import type { User } from '@supabase/supabase-js';
@@ -25,6 +26,17 @@ const ADMIN_EMAILS = [
   'v.jonathanwilliamusa@gmail.com',
   'w.vivekan@gmail.com'
 ];
+
+export interface SavedAddress {
+  id: string;
+  name: string;
+  phone: string;
+  street: string;
+  apt?: string;
+  city: string;
+  state: string;
+  zip: string;
+}
 
 export interface Order {
   id?: string;
@@ -140,6 +152,7 @@ interface AppStore {
   
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+  updateUserAddresses: (addresses: SavedAddress[]) => Promise<void>;
 }
 
 export const useAppStore = create<AppStore>((set, get) => ({
@@ -248,6 +261,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   getAllOrders: async () => {
     return await getAllOrdersAction();
+  },
+
+  updateUserAddresses: async (addresses) => {
+    await updateUserAddressesAction(addresses);
+    const currentUser = get().user;
+    if (currentUser) {
+      set({ user: { ...currentUser, user_metadata: { ...currentUser.user_metadata, savedAddresses: addresses } } });
+    }
   },
 
   updateOrderStatus: async (orderId, status) => {

@@ -11,6 +11,38 @@ const Account = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState<Order | null>(null);
+  const [isAddingAddress, setIsAddingAddress] = useState(false);
+  const [newAddress, setNewAddress] = useState({
+    name: '', phone: '', street: '', apt: '', city: '', state: '', zip: ''
+  });
+
+  const savedAddresses = user?.user_metadata?.savedAddresses || [];
+
+  const handleSaveAddress = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const addressToSave = {
+        id: crypto.randomUUID(),
+        ...newAddress
+      };
+      await useAppStore.getState().updateUserAddresses([...savedAddresses, addressToSave]);
+      setIsAddingAddress(false);
+      setNewAddress({ name: '', phone: '', street: '', apt: '', city: '', state: '', zip: '' });
+    } catch (err) {
+      logger.error('Failed to save address:', err);
+      alert('Failed to save address.');
+    }
+  };
+
+  const handleDeleteAddress = async (id: string) => {
+    try {
+      const newAddresses = savedAddresses.filter((a: any) => a.id !== id);
+      await useAppStore.getState().updateUserAddresses(newAddresses);
+    } catch (err) {
+      logger.error('Failed to delete address:', err);
+      alert('Failed to delete address.');
+    }
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -62,6 +94,54 @@ const Account = () => {
                 <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>{user.email}</p>
               </div>
             </div>
+          </div>
+          
+          {/* Address Book Section */}
+          <div style={{ background: '#f9f9f9', padding: '20px', borderRadius: '8px', border: '1px solid var(--border)', marginTop: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Address Book</h3>
+              {!isAddingAddress && (
+                <button className="secondary-btn" style={{ padding: '4px 8px', fontSize: '0.8rem' }} onClick={() => setIsAddingAddress(true)}>+ Add</button>
+              )}
+            </div>
+
+            {isAddingAddress ? (
+              <form onSubmit={handleSaveAddress} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <input type="text" placeholder="Full Name" required value={newAddress.name} onChange={e => setNewAddress({...newAddress, name: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
+                <input type="text" placeholder="Phone Number" required value={newAddress.phone} onChange={e => setNewAddress({...newAddress, phone: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
+                <input type="text" placeholder="Street Address" required value={newAddress.street} onChange={e => setNewAddress({...newAddress, street: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
+                <input type="text" placeholder="Apt, Suite, etc. (optional)" value={newAddress.apt} onChange={e => setNewAddress({...newAddress, apt: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <input type="text" placeholder="City" required value={newAddress.city} onChange={e => setNewAddress({...newAddress, city: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
+                  <input type="text" placeholder="State" required value={newAddress.state} onChange={e => setNewAddress({...newAddress, state: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
+                </div>
+                <input type="text" placeholder="PIN Code" required value={newAddress.zip} onChange={e => setNewAddress({...newAddress, zip: e.target.value})} className="form-input" style={{ padding: '8px', fontSize: '0.9rem' }} />
+                <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+                  <button type="submit" className="primary-btn" style={{ padding: '6px 12px', fontSize: '0.85rem', flex: 1 }}>Save</button>
+                  <button type="button" className="secondary-btn" style={{ padding: '6px 12px', fontSize: '0.85rem', flex: 1 }} onClick={() => setIsAddingAddress(false)}>Cancel</button>
+                </div>
+              </form>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                {savedAddresses.length === 0 ? (
+                  <p style={{ margin: 0, fontSize: '0.9rem', color: '#666' }}>No addresses saved yet.</p>
+                ) : (
+                  savedAddresses.map((addr: any) => (
+                    <div key={addr.id} style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '6px', background: 'white', position: 'relative' }}>
+                      <button 
+                        onClick={() => handleDeleteAddress(addr.id)}
+                        style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', color: '#999', cursor: 'pointer', fontSize: '1.2rem', lineHeight: 1 }}
+                        title="Delete address"
+                      >&times;</button>
+                      <p style={{ margin: '0 0 4px 0', fontWeight: 'bold', fontSize: '0.9rem', paddingRight: '20px' }}>{addr.name}</p>
+                      <p style={{ margin: '0 0 2px 0', fontSize: '0.85rem', color: '#555' }}>{addr.street}{addr.apt ? `, ${addr.apt}` : ''}</p>
+                      <p style={{ margin: '0 0 2px 0', fontSize: '0.85rem', color: '#555' }}>{addr.city}, {addr.state} {addr.zip}</p>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#555' }}>{addr.phone}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
 
