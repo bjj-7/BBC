@@ -87,6 +87,19 @@ export async function createOrderAction(order: any) {
     order_items: parsed.items
   });
   if (error) throw error;
+
+  try {
+    const { sendInvoiceEmail } = await import('../utils/email');
+    // data is the returned order id (uuid).
+    // Let's query the newly created order to get its full details for the email.
+    const { data: newOrder } = await supabase.from('orders').select('*').eq('id', data).single();
+    if (newOrder) {
+      await sendInvoiceEmail(newOrder);
+    }
+  } catch (emailError) {
+    console.error('Failed to send invoice email:', emailError);
+  }
+
   return data;
 }
 

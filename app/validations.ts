@@ -17,6 +17,7 @@ export const productSchema = z.object({
 // Order Creation Validation
 export const createOrderSchema = z.object({
   name: z.string().min(1).max(100),
+  email: z.string().email("Invalid email address"),
   phone: z.string().min(1).max(50),
   address: z.string().min(1).max(1000),
   notes: z.string().max(2000).optional().nullable(),
