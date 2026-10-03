@@ -45,7 +45,9 @@ export interface Order {
   email: string;
   name: string;
   phone: string;
-  address: string;
+  address?: string;
+  isCasagrand?: boolean;
+  apartmentNumber?: string;
   notes?: string;
   items: CartItem[];
   total: number;

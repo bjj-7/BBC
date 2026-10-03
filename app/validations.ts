@@ -19,7 +19,9 @@ export const createOrderSchema = z.object({
   name: z.string().min(1).max(100),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(1).max(50),
-  address: z.string().min(1).max(1000),
+  address: z.string().min(1).max(1000).optional().nullable(),
+  isCasagrand: z.boolean().default(false),
+  apartmentNumber: z.string().max(50).optional().nullable(),
   notes: z.string().max(2000).optional().nullable(),
   items: z.array(
     z.object({

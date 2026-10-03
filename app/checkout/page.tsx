@@ -14,10 +14,12 @@ const Checkout = () => {
   const { user, loginWithGoogle, createOrder } = useAppStore();
   
 
+  const [deliveryLocation, setDeliveryLocation] = useState<'casagrand' | 'outside'>('casagrand');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
+    apartmentNumber: '',
     addressStreet: '',
     addressApt: '',
     addressCity: '',
@@ -82,9 +84,22 @@ const Checkout = () => {
       return;
     }
 
-    if (!formData.name || !formData.email || !formData.phone || !formData.addressStreet || !formData.addressCity || !formData.addressState || !formData.addressZip) {
-      setError('Please fill in name, email, phone, and all required address fields.');
-      return;
+    if (deliveryLocation === 'casagrand') {
+      if (!formData.name || !formData.email || !formData.phone || !formData.apartmentNumber) {
+        setError('Please fill in name, email, phone, and apartment number.');
+        return;
+      }
+    } else {
+      if (!formData.name || !formData.email || !formData.phone || !formData.addressStreet || !formData.addressCity || !formData.addressState || !formData.addressZip) {
+        setError('Please fill in name, email, phone, and all required address fields.');
+        return;
+      }
+
+      const zipRegex = /^\d{6}$/;
+      if (!zipRegex.test(formData.addressZip.trim())) {
+        setError('Please enter a valid 6-digit Indian PIN code.');
+        return;
+      }
     }
 
     const cleanPhone = formData.phone.replace(/[\s-]/g, '');
@@ -94,18 +109,14 @@ const Checkout = () => {
       return;
     }
 
-    const zipRegex = /^\d{6}$/;
-    if (!zipRegex.test(formData.addressZip.trim())) {
-      setError('Please enter a valid 6-digit Indian PIN code.');
-      return;
-    }
-
     setIsSubmitting(true);
     
     try {
       const invoiceNumber = 'INV-' + Math.random().toString(36).substring(2, 8).toUpperCase();
       
-      const fullAddress = `${formData.addressStreet}${formData.addressApt ? `, ${formData.addressApt}` : ''}, ${formData.addressCity}, ${formData.addressState} ${formData.addressZip}, India`;
+      const fullAddress = deliveryLocation === 'casagrand' 
+        ? `Casagrand Savoye, Apt: ${formData.apartmentNumber}` 
+        : `${formData.addressStreet}${formData.addressApt ? `, ${formData.addressApt}` : ''}, ${formData.addressCity}, ${formData.addressState} ${formData.addressZip}, India`;
 
       const order: Omit<Order, 'id'> = {
         invoiceNumber,
@@ -117,6 +128,8 @@ const Checkout = () => {
         name: formData.name,
         phone: formData.phone,
         address: fullAddress,
+        isCasagrand: deliveryLocation === 'casagrand',
+        apartmentNumber: deliveryLocation === 'casagrand' ? formData.apartmentNumber : undefined,
         notes: formData.notes,
         items,
         total: cartTotal,
@@ -206,18 +219,36 @@ const Checkout = () => {
             <input type="email" id="email" placeholder="Email" required value={formData.email} onChange={handleInputChange} style={{ width: '100%' }} />
             <input type="tel" id="phone" placeholder="Phone number" required value={formData.phone} onChange={handleInputChange} style={{ width: '100%' }} />
             
-            <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <h4 style={{ margin: '0 0 -4px 0', fontSize: '0.95rem' }}>Shipping Address (India only)</h4>
-              <input type="text" id="addressStreet" placeholder="Street address" required value={formData.addressStreet} onChange={handleInputChange} style={{ width: '100%' }} />
-              <input type="text" id="addressApt" placeholder="Apartment, suite, etc. (optional)" value={formData.addressApt} onChange={handleInputChange} style={{ width: '100%' }} />
-              
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
-                <input type="text" id="addressCity" placeholder="City" required value={formData.addressCity} onChange={handleInputChange} style={{ width: '100%' }} />
-                <input type="text" id="addressState" placeholder="State / Province" required value={formData.addressState} onChange={handleInputChange} style={{ width: '100%' }} />
-              </div>
-              
-              <input type="text" id="addressZip" placeholder="PIN code (6 digits)" required value={formData.addressZip} onChange={handleInputChange} style={{ width: '100%' }} />
+            <div style={{ display: 'flex', gap: '16px', marginTop: '4px', background: '#f9f9f9', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 500 }}>
+                <input type="radio" name="deliveryLocation" checked={deliveryLocation === 'casagrand'} onChange={() => setDeliveryLocation('casagrand')} style={{ cursor: 'pointer' }} />
+                Casagrand Savoye
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 500 }}>
+                <input type="radio" name="deliveryLocation" checked={deliveryLocation === 'outside'} onChange={() => setDeliveryLocation('outside')} style={{ cursor: 'pointer' }} />
+                Outside Apartment
+              </label>
             </div>
+
+            {deliveryLocation === 'casagrand' ? (
+              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <h4 style={{ margin: '0 0 -4px 0', fontSize: '0.95rem' }}>Apartment Details</h4>
+                <input type="text" id="apartmentNumber" placeholder="Block & Apartment Number (e.g., A-101)" required value={formData.apartmentNumber} onChange={handleInputChange} style={{ width: '100%' }} />
+              </div>
+            ) : (
+              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <h4 style={{ margin: '0 0 -4px 0', fontSize: '0.95rem' }}>Shipping Address (India only)</h4>
+                <input type="text" id="addressStreet" placeholder="Street address" required value={formData.addressStreet} onChange={handleInputChange} style={{ width: '100%' }} />
+                <input type="text" id="addressApt" placeholder="Apartment, suite, etc. (optional)" value={formData.addressApt} onChange={handleInputChange} style={{ width: '100%' }} />
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
+                  <input type="text" id="addressCity" placeholder="City" required value={formData.addressCity} onChange={handleInputChange} style={{ width: '100%' }} />
+                  <input type="text" id="addressState" placeholder="State / Province" required value={formData.addressState} onChange={handleInputChange} style={{ width: '100%' }} />
+                </div>
+                
+                <input type="text" id="addressZip" placeholder="PIN code (6 digits)" required value={formData.addressZip} onChange={handleInputChange} style={{ width: '100%' }} />
+              </div>
+            )}
 
             <textarea id="notes" placeholder="Order notes (optional)" value={formData.notes} onChange={handleInputChange} rows={2} style={{ marginTop: '8px', width: '100%' }}></textarea>
             

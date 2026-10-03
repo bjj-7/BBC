@@ -82,9 +82,11 @@ export async function createOrderAction(order: any) {
   const { data, error } = await supabase.rpc('create_order', {
     order_name: parsed.name,
     order_phone: parsed.phone,
-    order_address: parsed.address,
+    order_address: parsed.address || '',
     order_notes: parsed.notes,
-    order_items: parsed.items
+    order_items: parsed.items,
+    is_casagrand: parsed.isCasagrand,
+    apartment_number: parsed.apartmentNumber
   });
   if (error) throw error;
 
