@@ -10,3 +10,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Automatic Deployment
 Always commit and push the code to trigger deployment after successfully implementing fixes. Use `git add .`, `git commit -m "..."`, and `git push` to deploy the code.
+
+# UI/UX Design System
+For any frontend, layout, or styling changes, you MUST refer to and strictly follow the guidelines in `design_system.md` located at the root of the project to ensure visual consistency and prevent responsive layout bugs (like mobile overflow errors).
