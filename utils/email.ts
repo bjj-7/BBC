@@ -24,8 +24,8 @@ export const sendInvoiceEmail = async (order: any) => {
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
       <td style="padding: 10px; text-align: center; border-bottom: 1px solid #eee;">${item.quantity}</td>
-      <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee;">₹${item.price.toFixed(2)}</td>
-      <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee;">₹${(item.price * item.quantity).toFixed(2)}</td>
+      <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee;">₹${Number(item.price).toFixed(2)}</td>
+      <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee;">₹${(Number(item.price) * Number(item.quantity)).toFixed(2)}</td>
     </tr>
   `).join('');
 
@@ -59,7 +59,7 @@ export const sendInvoiceEmail = async (order: any) => {
       </table>
 
       <div style="text-align: right; font-size: 1.2em; margin-bottom: 30px;">
-        <strong>Total: ₹${order.total.toFixed(2)}</strong>
+        <strong>Total: ₹${Number(order.total).toFixed(2)}</strong>
       </div>
 
       <div style="font-size: 0.9em; color: #666; text-align: center;">

@@ -89,11 +89,18 @@ export async function createOrderAction(order: any) {
   if (error) throw error;
 
   try {
+    const { createClient: createAdminClient } = await import('@supabase/supabase-js');
+    const adminSupabase = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    // Update the email in the DB to match the one provided in the checkout form
+    await adminSupabase.from('orders').update({ email: parsed.email }).eq('id', data);
+
     const { sendInvoiceEmail } = await import('../utils/email');
-    // data is the returned order id (uuid).
-    // Let's query the newly created order to get its full details for the email.
-    const { data: newOrder } = await supabase.from('orders').select('*').eq('id', data).single();
+    const { data: newOrder } = await adminSupabase.from('orders').select('*').eq('id', data).single();
     if (newOrder) {
+      // Ensure numeric types are formatted correctly to avoid toFixed errors
       await sendInvoiceEmail(newOrder);
     }
   } catch (emailError) {
