@@ -5,6 +5,7 @@ import { useCartStore } from '../../src/store/useCartStore';
 import { useAppStore, type Order } from '../../src/store/useAppStore';
 import InvoiceModal from '../../src/components/InvoiceModal';
 import { Trash2, Plus, Minus, Edit2, Check } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { logger } from '../../src/utils/logger';
 
 const Checkout = () => {
@@ -324,6 +325,21 @@ const Checkout = () => {
             <p style={{ margin: '0 0 5px 0', fontSize: '0.9rem', color: '#666' }}>Invoice Number</p>
             <p style={{ margin: 0, fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--accent-2)' }}>{completedOrder?.invoiceNumber}</p>
           </div>
+          
+          {completedOrder && (
+            <div style={{ marginBottom: '20px', padding: '15px', background: 'white', borderRadius: '8px', border: '1px solid var(--border)' }}>
+              <p style={{ margin: '0 0 10px 0', fontSize: '0.95rem', fontWeight: 'bold', color: '#333' }}>Pay with GPay / Any UPI App</p>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+                <QRCodeSVG 
+                  value={`upi://pay?pa=v.jonathanwilliam@okaxis&pn=Jonathan%20William%20Vivekan%20Kasi%20Rathinakumar&am=${completedOrder.total.toFixed(2)}&cu=INR&tn=Invoice%20${completedOrder.invoiceNumber}`} 
+                  size={150} 
+                  level="Q"
+                />
+              </div>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>Scan to instantly pay ₹{completedOrder.total.toFixed(2)}</p>
+            </div>
+          )}
+
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
             <button className="primary-btn" onClick={() => setShowInvoice(true)}>View Invoice</button>
             <button className="secondary-btn" onClick={resetSuccess}>Continue Shopping</button>

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Order } from '../store/useAppStore';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface InvoiceModalProps {
   order: Order | null;
@@ -93,6 +94,20 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ order, onClose }) => {
             </div>
           </div>
           
+          {order.status === 'pending' && (
+            <div className="no-print" style={{ marginTop: '30px', padding: '20px', background: '#fff', borderRadius: '8px', border: '1px solid var(--border)', textAlign: 'center' }}>
+              <h4 style={{ margin: '0 0 10px 0', fontSize: '1.05rem', color: '#333' }}>Pay with GPay / Any UPI App</h4>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+                <QRCodeSVG 
+                  value={`upi://pay?pa=v.jonathanwilliam@okaxis&pn=Jonathan%20William%20Vivekan%20Kasi%20Rathinakumar&am=${order.total.toFixed(2)}&cu=INR&tn=Invoice%20${order.invoiceNumber}`} 
+                  size={150} 
+                  level="Q"
+                />
+              </div>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#666' }}>Scan to instantly pay ₹{order.total.toFixed(2)}</p>
+            </div>
+          )}
+
           <div style={{ marginTop: '40px', textAlign: 'center', color: '#777', fontSize: '0.85rem' }}>
             <p style={{ margin: 0 }}>Thank you for your business!</p>
             <p style={{ margin: '4px 0 0 0' }}>If you have any questions about this invoice, please contact us.</p>
