@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import '../src/index.css'; // Global CSS
 import ClientLayoutWrapper from './ClientLayoutWrapper';
+import { Analytics } from '@vercel/analytics/next';
 
 export const viewport: Viewport = {
   themeColor: '#000000',
@@ -36,6 +37,7 @@ export default function RootLayout({
             {children}
           </ClientLayoutWrapper>
         </div>
+        <Analytics />
       </body>
     </html>
   );
