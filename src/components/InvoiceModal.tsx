@@ -24,7 +24,29 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ order, onClose }) => {
         </div>
 
         {/* Printable Area */}
-        <div className="invoice-container">
+        <div className="invoice-container" style={{ position: 'relative' }}>
+          {order.status === 'cancelled' && (
+            <div style={{
+              position: 'absolute',
+              top: '40%',
+              left: '50%',
+              transform: 'translate(-50%, -50%) rotate(-30deg)',
+              fontSize: 'min(5rem, 12vw)',
+              fontWeight: '900',
+              color: 'rgba(217, 85, 41, 0.15)',
+              border: '6px solid rgba(217, 85, 41, 0.15)',
+              padding: '10px 40px',
+              borderRadius: '16px',
+              textTransform: 'uppercase',
+              letterSpacing: '8px',
+              pointerEvents: 'none',
+              zIndex: 10,
+              whiteSpace: 'nowrap'
+            }}>
+              Cancelled
+            </div>
+          )}
+
           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid var(--border)', paddingBottom: '20px', marginBottom: '20px' }}>
             <div>
               <img src="/logo.png" alt="Basement Buzz Corner Logo" style={{ height: '50px', marginBottom: '10px', mixBlendMode: 'multiply' }} />
@@ -54,8 +76,8 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ order, onClose }) => {
                 fontSize: '0.9rem', 
                 fontWeight: '600',
                 textTransform: 'capitalize',
-                background: order.status === 'complete' ? '#d4edda' : '#f8f9fa',
-                color: order.status === 'complete' ? '#155724' : '#333',
+                background: order.status === 'complete' ? '#d4edda' : order.status === 'cancelled' ? '#fdeaea' : '#f8f9fa',
+                color: order.status === 'complete' ? '#155724' : order.status === 'cancelled' ? '#D95529' : '#333',
                 border: '1px solid var(--border)',
                 display: 'inline-block'
               }}>
